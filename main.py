@@ -7,8 +7,7 @@ class Piece():
         elif (relative_move[1]<0 and self.move_backwards):relative_move[1] *=-1
         if (relative_move[0]<0):relative_move[0] *=-1
         if (len(self.move_map)>relative_move[0] and len(self.move_map[relative_move[0]])>relative_move[1] and self.move_map[relative_move[0]][relative_move[1]]):return True
-        return False
-    def __str__(self): return self.name
+    def __str__(self):return self.name
 class Pawn(Piece):
     def __init__(self,color):super().__init__([[0,1,1],[0,1]], False,"♟",color)
 class King(Piece):
@@ -29,19 +28,16 @@ class Game:
             else:window.Rows[y][x].update(text=str(self.board[x][y]),button_color=["#"+"FFFFFF"*(1-self.board[x][y].color)+"000000"*self.board[x][y].color,"#"+"9a7b4c"*((x+y)%2)+"c5b8a6"*((x+y+1)%2)])
     def interference(self,move_from,move_to):
         sign = lambda x: x and (1, -1)[x<0]
-        d = [sign(x[0]-x[1]) for x in zip(move_to, move_from)]
-        cursor = [sum(x) for x in zip(move_from, d)]
+        cursor = [sum(x) for x in zip(move_from, [sign(x[0]-x[1]) for x in zip(move_to, move_from)])]
         while cursor != move_to:
             if not self.board[cursor[0]][cursor[1]] == "":return True
-            cursor = [sum(x) for x in zip(cursor, d)]
-        return False 
+            cursor = [sum(x) for x in zip(cursor, [sign(x[0]-x[1]) for x in zip(move_to, move_from)])]
     def testCheck(self):#TODO Handle checkmate
         king_x,king_y = list(filter(None,[[(j,i) for j,el in enumerate(col) if el.__class__.__name__ == "King" and el.color == self.player_turn] for i, col in enumerate(self.board)]))[0][0]
         for (row,col) in [(y,x) for y in range(8) for x in range(8)]:
                 if self.board[row][col]!="" and self.board[row][col].color==1-self.player_turn and self.board[row][col].can_move([x[0]-x[1] for x in zip([king_y,king_x], [row,col])]):
                     if (self.board[row][col].__class__.__name__ == "Pawn"): return True*(abs(col-king_x)==1)
                     elif (self.board[row][col].__class__.__name__ == "Knight" or not self.interference([row,col],[king_y,king_x])):return True
-        return False
     def move(self,move_from,move_to): #TODO Castle mechanics #TODO possible line cuts here
         if (self.board[move_from[0]][move_from[1]].color == self.player_turn and self.board[move_from[0]][move_from[1]].can_move([x[0]-x[1] for x in zip(move_to, move_from)])): #Checks right player is playing and that the piece has the capability to move there
             tmp_board = [x[:] for x in self.board] # Save old board before anything
@@ -55,7 +51,6 @@ class Game:
                 return False
             if (self.board[move_to[0]][move_to[1]].__class__.__name__ == "Pawn" and self.board[move_to[0]][move_to[1]].move_map==[[0,1,1],[0,1]]): self.board[move_to[0]][move_to[1]].move_map=[[0,1],[0,1]] # If we're a pawn with extended moveset and we just moved, remove the extended moveset
             return True # End method successfully
-        else:return False # Move failed  
 window = sg.Window("MiniChess", [[sg.Button(key=str(col)+str(row),size=(3,1), pad=(0,0),font='Courier 20') for col in range(8)] for row in range(8)], finalize=True,no_titlebar=True,keep_on_top=True)  
 game = Game()
 while True:
