@@ -8,7 +8,7 @@ class Piece():
         if (relative_move[0]<0):relative_move[0] *=-1
         if (len(self.move_map)>relative_move[0] and len(self.move_map[relative_move[0]])>relative_move[1] and self.move_map[relative_move[0]][relative_move[1]]):return True
         return False
-    def __str__(self):return self.name
+    def __str__(self): return self.name
 class Pawn(Piece):
     def __init__(self,color):super().__init__([[0,1,1],[0,1]], False,"♟",color)
 class King(Piece):
