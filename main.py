@@ -50,6 +50,7 @@ class Game:
                 self.board = tmp_board[:]
                 return False
             if (self.board[move_to[0]][move_to[1]].__class__.__name__ == "Pawn" and self.board[move_to[0]][move_to[1]].move_map==[[0,1,1],[0,1]]): self.board[move_to[0]][move_to[1]].move_map=[[0,1],[0,1]] # If we're a pawn with extended moveset and we just moved, remove the extended moveset
+            if (self.board[move_to[0]][move_to[1]].__class__.__name__ == "Pawn" and move_to[1]==7*(1-self.player_turn)): self.board[move_to[0]][move_to[1]] =Queen(self.player_turn) # Promotion
             return True # End method successfully
 window = sg.Window("MiniChess", [[sg.Button(key=str(col)+str(row),size=(3,1), pad=(0,0),font='Courier 20') for col in range(8)] for row in range(8)], finalize=True,no_titlebar=True,keep_on_top=True)  
 game = Game()
