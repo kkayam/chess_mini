@@ -1,6 +1,5 @@
-import PySimpleGUI as sg
-class Piece():
-    def __init__(self, move_map = [],move_backwards = False, name = "",color=0):self.id,self.color,self.move_map,self.move_backwards,self.name = 0,color,move_map,move_backwards,name
+import collections, PySimpleGUI as sg
+class Piece(collections.namedtuple('Piece', 'move_map move_backwards name color')):
     def can_move(self,relative_move):
         if (self.color == 1):relative_move = [x*-1 for x in relative_move]
         if (relative_move[1]<0 and not self.move_backwards): return False
@@ -8,20 +7,8 @@ class Piece():
         if (relative_move[0]<0):relative_move[0] *=-1
         if (len(self.move_map)>relative_move[0] and len(self.move_map[relative_move[0]])>relative_move[1] and self.move_map[relative_move[0]][relative_move[1]]):return True
     def __str__(self):return self.name
-class Pawn(Piece):
-    def __init__(self,color):super().__init__([[0,1,1],[0,1]], False,"♟",color)
-class King(Piece):
-    def __init__(self,color):super().__init__([[0,1],[1,1]], True,"♚",color)
-class Queen(Piece):
-    def __init__(self,color):super().__init__([[0,1,1,1,1,1,1,1],[1,1],[1,0,1],[1,0,0,1],[1,0,0,0,1],[1,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,0,1]], True,"♛",color)
-class Bishop(Piece):
-    def __init__(self,color):super().__init__([[0],[0,1],[0,0,1],[0,0,0,1],[0,0,0,0,1],[0,0,0,0,0,1],[0,0,0,0,0,0,1],[0,0,0,0,0,0,0,1]], True,"♝",color)
-class Rook(Piece):
-    def __init__(self,color):super().__init__([[0,1,1,1,1,1,1,1],[1],[1],[1],[1],[1],[1],[1]], True,"♜",color)
-class Knight(Piece):
-    def __init__(self,color):super().__init__([[0],[0,0,1],[0,1]], True,"♞",color)
-class Game:
-    def __init__(self):self.player_turn,self.board = 0,[[Rook(0),Pawn(0),"","","","",Pawn(1),Rook(1)],[Knight(0),Pawn(0),"","","","",Pawn(1),Knight(1)],[Bishop(0),Pawn(0),"","","","",Pawn(1),Bishop(1)],[Queen(0),Pawn(0),"","","","",Pawn(1),Queen(1)],[King(0),Pawn(0),"","","","",Pawn(1),King(1)],[Bishop(0),Pawn(0),"","","","",Pawn(1),Bishop(1)],[Knight(0),Pawn(0),"","","","",Pawn(1),Knight(1)],[Rook(0),Pawn(0),"","","","",Pawn(1),Rook(1)]]
+Pawn,King,Queen,Bishop,Rook,Knight = lambda color: Piece([[0,1,1],[0,1]], False,"♟", color),lambda color: Piece([[0,1],[1,1]], True,"♚", color),lambda color: Piece([[0,1,1,1,1,1,1,1],[1,1],[1,0,1],[1,0,0,1],[1,0,0,0,1],[1,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,0,1]], True,"♛", color),lambda color: Piece([[0],[0,1],[0,0,1],[0,0,0,1],[0,0,0,0,1],[0,0,0,0,0,1],[0,0,0,0,0,0,1],[0,0,0,0,0,0,0,1]], True,"♝", color),lambda color: Piece([[0,1,1,1,1,1,1,1],[1],[1],[1],[1],[1],[1],[1]], True,"♜", color),lambda color: Piece([[0],[0,0,1],[0,1]], True,"♞", color)
+class Game(collections.namedtuple('Game', 'player_turn wcastle bcastle board')):
     def print_board(self):
         for (y,x) in [(y,x) for y in range(8) for x in range(8)]:
             if (self.board[x][y]==""):window.Rows[y][x].update(text=str(self.board[x][y]),button_color=["","#"+"9a7b4c"*((x+y)%2)+"c5b8a6"*((x+y+1)%2)])
@@ -53,7 +40,7 @@ class Game:
             if (self.board[move_to[0]][move_to[1]].__class__.__name__ == "Pawn" and move_to[1]==7*(1-self.player_turn)): self.board[move_to[0]][move_to[1]] =Queen(self.player_turn) # Promotion
             return True # End method successfully
 window = sg.Window("MiniChess", [[sg.Button(key=str(col)+str(row),size=(3,1), pad=(0,0),font='Courier 20') for col in range(8)] for row in range(8)], finalize=True,no_titlebar=True,keep_on_top=True)  
-game = Game()
+game = Game(0,True,True,[[Rook(0),Pawn(0),"","","","",Pawn(1),Rook(1)],[Knight(0),Pawn(0),"","","","",Pawn(1),Knight(1)],[Bishop(0),Pawn(0),"","","","",Pawn(1),Bishop(1)],[Queen(0),Pawn(0),"","","","",Pawn(1),Queen(1)],[King(0),Pawn(0),"","","","",Pawn(1),King(1)],[Bishop(0),Pawn(0),"","","","",Pawn(1),Bishop(1)],[Knight(0),Pawn(0),"","","","",Pawn(1),Knight(1)],[Rook(0),Pawn(0),"","","","",Pawn(1),Rook(1)]])
 while True:
     game.print_board()
     [event1, _],[event2, _] = window.read(),window.read()
